@@ -9,7 +9,7 @@ import NavBar from "./NavBar";
 import Upload from "./Upload";
 
 const App: React.FunctionComponent = () => {
-  const [plantKey, setPlantKey] = React.useState<PlantKeys>("Dandelion");
+  const [plantKey, setPlantKey] = React.useState<PlantKeys>(undefined);
   const [mode, setMode] = React.useState<PictureMode>("camera");
   const [loadingMessage, setLoadingMessage] = React.useState<string>("");
   const navbarRef = React.useRef<HTMLDivElement>(null);
