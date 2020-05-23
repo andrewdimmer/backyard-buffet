@@ -129,14 +129,28 @@ const Camera: React.FunctionComponent<CameraProps> = ({
             audio={false}
             width={maxWidth}
             height={maxHeight}
-            onUserMediaError={() => {
-              setWebcamEnabled(false);
+            mirrored={facingMode === "user"}
+            onUserMediaError={(err) => {
+              const errString = err.toString();
+              if (errString.indexOf("Malformed constraints object") >= 0) {
+                setUseVideoContraints(false);
+              } else if (
+                errString.indexOf("Could not start video source") < 0
+              ) {
+                setWebcamError(errString);
+              }
             }}
             ref={webcamRef}
-            videoConstraints={{
-              aspectRatio: maxWidth / (maxHeight - 1),
-              deviceId,
-            }}
+            videoConstraints={
+              useVideoConstraints
+                ? {
+                    aspectRatio: getAspectRatio(),
+                    facingMode,
+                  }
+                : {
+                    aspectRatio: getAspectRatio(),
+                  }
+            }
           />
           <Container className={classes.pageTitle} ref={takePictureRef}>
             <Button
@@ -153,7 +167,7 @@ const Camera: React.FunctionComponent<CameraProps> = ({
               aria-label="flip-camera"
               className={classes.fab}
               color="primary"
-              onClick={() => nextCamera(deviceId)}
+              onClick={toggleCameraFacingMode}
             >
               <FlipCameraIcon />
             </Fab>
