@@ -27,7 +27,7 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const takePictureRef = React.useRef<HTMLDivElement>(null);
   const [deviceId, setDeviceId] = React.useState<string>("");
   const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
-  const [webcamEnabled, setWebcamEnabled] = React.useState<boolean>(true);
+  const [webcamError, setWebcamError] = React.useState<string>("");
 
   const capture = () => {
     setLoadingMessage("Analyzing Image...");
@@ -117,7 +117,7 @@ const Camera: React.FunctionComponent<CameraProps> = ({
           left: 0,
         }}
       />
-      {webcamEnabled ? (
+      {webcamError === "" ? (
         <Fragment>
           <Webcam
             audio={false}
@@ -155,9 +155,8 @@ const Camera: React.FunctionComponent<CameraProps> = ({
         </Fragment>
       ) : (
         <Container className={classes.pageTitle}>
-          <Typography variant="h3">
-            Please grant access to a camera for this feature to work.
-          </Typography>
+          <Typography variant="h3">Error: Unable to access camera.</Typography>
+          <Typography variant="body1">{webcamError}</Typography>
         </Container>
       )}
       {setTimeout(initializeSize, 1) && <Fragment />}
