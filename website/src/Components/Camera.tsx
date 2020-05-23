@@ -25,9 +25,12 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const screenHeight = React.useRef<HTMLDivElement>(null);
   const webcamRef = React.useRef<any>(null);
   const takePictureRef = React.useRef<HTMLDivElement>(null);
-  const [deviceId, setDeviceId] = React.useState<string>("");
-  const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
+  const [facingMode, setFacingMode] = React.useState<string>("user");
+  const [devices, setDevices] = React.useState<any[]>([]);
   const [webcamError, setWebcamError] = React.useState<string>("");
+  const [useVideoConstraints, setUseVideoContraints] = React.useState<boolean>(
+    true
+  );
 
   const capture = () => {
     setLoadingMessage("Analyzing Image...");
@@ -48,25 +51,28 @@ const Camera: React.FunctionComponent<CameraProps> = ({
       const filteredDevices = mediaDevices.filter(
         ({ kind }) => kind === "videoinput"
       );
-      setDeviceId(filteredDevices[0].deviceId);
       setDevices(filteredDevices);
     },
     [setDevices]
   );
 
-  const nextCamera = (deviceId: string) => {
-    if (deviceId !== "") {
-      for (let i = 0; i < devices.length; i++) {
-        if (deviceId === devices[i].deviceId) {
-          setDeviceId(devices[(i + 1) % devices.length].deviceId);
-          break;
-        }
-      }
+  const toggleCameraFacingMode = () => {
+    if (facingMode === "user") {
+      setFacingMode("environment");
+    } else {
+      setFacingMode("user");
     }
   };
 
   React.useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then(handleDevices);
+    try {
+      navigator.mediaDevices.enumerateDevices().then(handleDevices);
+    } catch {
+      console.log(
+        "Device may not support listing devices; assume multiple cameras"
+      );
+      setDevices([{}, {}]);
+    }
   }, [handleDevices]);
 
   const computeWidthAndHeight = () => {
