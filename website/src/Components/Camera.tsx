@@ -1,9 +1,9 @@
-import { Button, Container, Fab, Typography } from "@material-ui/core";
+import { Button, Container, Typography } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import FlipCameraIcon from "@material-ui/icons/FlipCameraAndroid";
 import React, { Fragment } from "react";
 import Webcam from "react-webcam";
 import { PlantKeys } from "../@Types/types";
+import { isSafari } from "../Scripts/browserIdentification";
 import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface CameraProps {
@@ -25,9 +25,10 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const screenHeight = React.useRef<HTMLDivElement>(null);
   const webcamRef = React.useRef<any>(null);
   const takePictureRef = React.useRef<HTMLDivElement>(null);
-  const [deviceId, setDeviceId] = React.useState<string>("");
-  const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);
-  const [webcamEnabled, setWebcamEnabled] = React.useState<boolean>(true);
+  const [webcamError, setWebcamError] = React.useState<string>("");
+  const [useVideoConstraints, setUseVideoContraints] = React.useState<boolean>(
+    true
+  );
 
   const capture = () => {
     setLoadingMessage("Analyzing Image...");
@@ -42,32 +43,6 @@ const Camera: React.FunctionComponent<CameraProps> = ({
       10
     );
   };
-
-  const handleDevices = React.useCallback(
-    (mediaDevices: MediaDeviceInfo[]) => {
-      const filteredDevices = mediaDevices.filter(
-        ({ kind }) => kind === "videoinput"
-      );
-      setDeviceId(filteredDevices[0].deviceId);
-      setDevices(filteredDevices);
-    },
-    [setDevices]
-  );
-
-  const nextCamera = (deviceId: string) => {
-    if (deviceId !== "") {
-      for (let i = 0; i < devices.length; i++) {
-        if (deviceId === devices[i].deviceId) {
-          setDeviceId(devices[(i + 1) % devices.length].deviceId);
-          break;
-        }
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then(handleDevices);
-  }, [handleDevices]);
 
   const computeWidthAndHeight = () => {
     if (
@@ -95,6 +70,19 @@ const Camera: React.FunctionComponent<CameraProps> = ({
     });
   };
 
+  const getAspectRatio = () => {
+    if (maxHeight === 0 && maxWidth === 0) {
+      return undefined;
+    } else {
+      const orientation = window.screen.orientation;
+      if (orientation.type.indexOf("portrait") >= 0) {
+        return maxHeight / (maxWidth - 1);
+      } else {
+        return maxWidth / (maxHeight - 1);
+      }
+    }
+  };
+
   return (
     <Fragment>
       <div
@@ -117,20 +105,37 @@ const Camera: React.FunctionComponent<CameraProps> = ({
           left: 0,
         }}
       />
-      {webcamEnabled ? (
+      {webcamError === "" ? (
         <Fragment>
           <Webcam
             audio={false}
             width={maxWidth}
             height={maxHeight}
-            onUserMediaError={() => {
-              setWebcamEnabled(false);
+            onUserMediaError={(err) => {
+              const errString = err.toString();
+              if (errString.indexOf("Malformed constraints object") >= 0) {
+                setUseVideoContraints(false);
+              } else if (
+                errString.indexOf("Could not start video source") < 0
+              ) {
+                setWebcamError(errString);
+              }
             }}
             ref={webcamRef}
-            videoConstraints={{
-              aspectRatio: maxWidth / (maxHeight - 1),
-              deviceId,
-            }}
+            videoConstraints={
+              !isSafari
+                ? useVideoConstraints
+                  ? {
+                      aspectRatio: getAspectRatio(),
+                      facingMode: "environment",
+                    }
+                  : {
+                      aspectRatio: getAspectRatio(),
+                    }
+                : {
+                    facingMode: "environment",
+                  }
+            }
           />
           <Container className={classes.pageTitle} ref={takePictureRef}>
             <Button
@@ -142,22 +147,11 @@ const Camera: React.FunctionComponent<CameraProps> = ({
               Take Picture
             </Button>
           </Container>
-          {devices.length > 1 && (
-            <Fab
-              aria-label="flip-camera"
-              className={classes.fab}
-              color="primary"
-              onClick={() => nextCamera(deviceId)}
-            >
-              <FlipCameraIcon />
-            </Fab>
-          )}
         </Fragment>
       ) : (
         <Container className={classes.pageTitle}>
-          <Typography variant="h3">
-            Please grant access to a camera for this feature to work.
-          </Typography>
+          <Typography variant="h3">Error: Unable to access camera.</Typography>
+          <Typography variant="body1">{webcamError}</Typography>
         </Container>
       )}
       {setTimeout(initializeSize, 1) && <Fragment />}
