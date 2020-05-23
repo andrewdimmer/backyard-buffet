@@ -24,10 +24,21 @@ export const styles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2),
       textAlign: "center",
     },
-    fab: {
-      position: "absolute",
-      bottom: theme.spacing(1),
-      right: theme.spacing(2),
+    successColor: {
+      color: "#FFFFFF",
+      backgroundColor: theme.palette.success.main,
+    },
+    infoColor: {
+      color: "#FFFFFF",
+      backgroundColor: theme.palette.info.main,
+    },
+    warningColor: {
+      color: "#FFFFFF",
+      backgroundColor: theme.palette.warning.main,
+    },
+    errorColor: {
+      color: "#FFFFFF",
+      backgroundColor: theme.palette.error.main,
     },
   })
 );
