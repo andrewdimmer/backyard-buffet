@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { PictureMode } from "../@Types/types";
+import { PictureMode, PlantKeys } from "../@Types/types";
 import { styles } from "../Styles";
 import Camera from "./Camera";
 import Info from "./Info";
@@ -8,13 +8,13 @@ import Upload from "./Upload";
 import LoadingScreen from "./LoadingScreen";
 
 const App: React.FunctionComponent = () => {
-  const [plant, setPlant] = React.useState<string>("");
+  const [plantKey, setPlantKeys] = React.useState<PlantKeys>(undefined);
   const [mode, setMode] = React.useState<PictureMode>("camera");
   const [loadingMessage, setLoadingMessage] = React.useState<string>("");
   const navbarRef = React.useRef<HTMLDivElement>(null);
 
   const back = () => {
-    setPlant("");
+    setPlantKeys(undefined);
   };
 
   const toggleMode = () => {
@@ -27,13 +27,13 @@ const App: React.FunctionComponent = () => {
     <Fragment>
       <NavBar
         navbarRef={navbarRef}
-        title={plant ? plant : "Backyard Buffet"}
-        mode={plant ? undefined : mode}
-        back={plant ? back : undefined}
-        toggleMode={plant ? undefined : toggleMode}
+        title={plantKey ? plantKey : "Backyard Buffet"}
+        mode={plantKey ? undefined : mode}
+        back={plantKey ? back : undefined}
+        toggleMode={plantKey ? undefined : toggleMode}
       />
-      {plant ? (
-        <Info />
+      {plantKey ? (
+        <Info plantKey={plantKey} />
       ) : mode === "camera" ? (
         <Camera
           navbarRef={navbarRef}
