@@ -3,6 +3,7 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt";
 import FlipCameraIcon from "@material-ui/icons/FlipCameraAndroid";
 import React, { Fragment } from "react";
 import Webcam from "react-webcam";
+import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface CameraProps {
   navbarRef: React.RefObject<HTMLDivElement>;
@@ -25,7 +26,14 @@ const Camera: React.FunctionComponent<CameraProps> = ({
 
   const capture = () => {
     const imageSrc = webcamRef.current?.getScreenshot();
-    console.log(imageSrc);
+    (document.getElementById("automlImage") as HTMLImageElement).src = imageSrc;
+    setTimeout(
+      () =>
+        predictPlant()
+          .then((prediction) => console.log(prediction))
+          .catch((err) => console.log(err)),
+      10
+    );
   };
 
   const handleDevices = React.useCallback(

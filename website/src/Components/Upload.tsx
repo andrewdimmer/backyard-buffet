@@ -1,6 +1,7 @@
+import { Container, Typography } from "@material-ui/core";
 import { DropzoneArea } from "material-ui-dropzone";
 import React, { Fragment } from "react";
-import { Container, Typography } from "@material-ui/core";
+import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface UploadProps {
   classes: any;
@@ -31,7 +32,17 @@ const Upload: React.FunctionComponent<UploadProps> = ({ classes }) => {
           maxFileSize={5000000}
           showPreviewsInDropzone={false}
           onDrop={async (files: any) => {
-            console.log(await getBase64(files[0]));
+            const imageSrc = await getBase64(files[0]);
+            (document.getElementById(
+              "automlImage"
+            ) as HTMLImageElement).src = imageSrc;
+            setTimeout(
+              () =>
+                predictPlant()
+                  .then((prediction) => console.log(prediction))
+                  .catch((err) => console.log(err)),
+              10
+            );
           }}
         />
       </Container>
