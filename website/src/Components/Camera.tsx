@@ -101,6 +101,19 @@ const Camera: React.FunctionComponent<CameraProps> = ({
     });
   };
 
+  const getAspectRatio = () => {
+    if (maxHeight === 0 && maxWidth === 0) {
+      return undefined;
+    } else {
+      const orientation = window.screen.orientation;
+      if (orientation.type.indexOf("portrait") >= 0) {
+        return maxHeight / (maxWidth - 1);
+      } else {
+        return maxWidth / (maxHeight - 1);
+      }
+    }
+  };
+
   return (
     <Fragment>
       <div
