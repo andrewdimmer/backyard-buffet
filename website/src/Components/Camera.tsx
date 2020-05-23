@@ -5,6 +5,7 @@ import React, { Fragment } from "react";
 import Webcam from "react-webcam";
 import { PlantKeys } from "../@Types/types";
 import { predictPlant } from "../Scripts/tensorflow";
+import { isSafari } from "../Scripts/browserIdentification";
 
 declare interface CameraProps {
   navbarRef: React.RefObject<HTMLDivElement>;
@@ -25,7 +26,7 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const screenHeight = React.useRef<HTMLDivElement>(null);
   const webcamRef = React.useRef<any>(null);
   const takePictureRef = React.useRef<HTMLDivElement>(null);
-  const [facingMode, setFacingMode] = React.useState<string>("user");
+  const [facingMode, setFacingMode] = React.useState<string>("environment");
   const [devices, setDevices] = React.useState<any[]>([]);
   const [webcamError, setWebcamError] = React.useState<string>("");
   const [useVideoConstraints, setUseVideoContraints] = React.useState<boolean>(
@@ -155,13 +156,17 @@ const Camera: React.FunctionComponent<CameraProps> = ({
             }}
             ref={webcamRef}
             videoConstraints={
-              useVideoConstraints
-                ? {
-                    aspectRatio: getAspectRatio(),
-                    facingMode,
-                  }
+              !isSafari
+                ? useVideoConstraints
+                  ? {
+                      aspectRatio: getAspectRatio(),
+                      facingMode,
+                    }
+                  : {
+                      aspectRatio: getAspectRatio(),
+                    }
                 : {
-                    aspectRatio: getAspectRatio(),
+                    facingMode,
                   }
             }
           />
