@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
 
   camera: ^0.5.8+2
+  tflite: ^1.0.5
 
 dev_dependencies:
   flutter_test:
@@ -66,3 +67,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  assets:
+    - assets/dict.txt
+    - assets/model.tflite
+    - assets/tflite_metadata.json
