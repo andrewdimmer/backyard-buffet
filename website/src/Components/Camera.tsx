@@ -1,11 +1,10 @@
-import { Button, Container, Fab, Typography } from "@material-ui/core";
+import { Button, Container, Typography } from "@material-ui/core";
 import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import FlipCameraIcon from "@material-ui/icons/FlipCameraAndroid";
 import React, { Fragment } from "react";
 import Webcam from "react-webcam";
 import { PlantKeys } from "../@Types/types";
-import { predictPlant } from "../Scripts/tensorflow";
 import { isSafari } from "../Scripts/browserIdentification";
+import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface CameraProps {
   navbarRef: React.RefObject<HTMLDivElement>;
@@ -26,8 +25,6 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const screenHeight = React.useRef<HTMLDivElement>(null);
   const webcamRef = React.useRef<any>(null);
   const takePictureRef = React.useRef<HTMLDivElement>(null);
-  const [facingMode, setFacingMode] = React.useState<string>("environment");
-  const [devices, setDevices] = React.useState<any[]>([]);
   const [webcamError, setWebcamError] = React.useState<string>("");
   const [useVideoConstraints, setUseVideoContraints] = React.useState<boolean>(
     true
@@ -46,35 +43,6 @@ const Camera: React.FunctionComponent<CameraProps> = ({
       10
     );
   };
-
-  const handleDevices = React.useCallback(
-    (mediaDevices: MediaDeviceInfo[]) => {
-      const filteredDevices = mediaDevices.filter(
-        ({ kind }) => kind === "videoinput"
-      );
-      setDevices(filteredDevices);
-    },
-    [setDevices]
-  );
-
-  const toggleCameraFacingMode = () => {
-    if (facingMode === "user") {
-      setFacingMode("environment");
-    } else {
-      setFacingMode("user");
-    }
-  };
-
-  React.useEffect(() => {
-    try {
-      navigator.mediaDevices.enumerateDevices().then(handleDevices);
-    } catch {
-      console.log(
-        "Device may not support listing devices; assume multiple cameras"
-      );
-      setDevices([{}, {}]);
-    }
-  }, [handleDevices]);
 
   const computeWidthAndHeight = () => {
     if (
@@ -143,7 +111,6 @@ const Camera: React.FunctionComponent<CameraProps> = ({
             audio={false}
             width={maxWidth}
             height={maxHeight}
-            mirrored={facingMode === "user"}
             onUserMediaError={(err) => {
               const errString = err.toString();
               if (errString.indexOf("Malformed constraints object") >= 0) {
@@ -160,13 +127,13 @@ const Camera: React.FunctionComponent<CameraProps> = ({
                 ? useVideoConstraints
                   ? {
                       aspectRatio: getAspectRatio(),
-                      facingMode,
+                      facingMode: "environment",
                     }
                   : {
                       aspectRatio: getAspectRatio(),
                     }
                 : {
-                    facingMode,
+                    facingMode: "environment",
                   }
             }
           />
@@ -180,16 +147,6 @@ const Camera: React.FunctionComponent<CameraProps> = ({
               Take Picture
             </Button>
           </Container>
-          {devices.length > 1 && (
-            <Fab
-              aria-label="flip-camera"
-              className={classes.fab}
-              color="primary"
-              onClick={toggleCameraFacingMode}
-            >
-              <FlipCameraIcon />
-            </Fab>
-          )}
         </Fragment>
       ) : (
         <Container className={classes.pageTitle}>
