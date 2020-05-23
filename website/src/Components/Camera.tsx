@@ -7,11 +7,13 @@ import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface CameraProps {
   navbarRef: React.RefObject<HTMLDivElement>;
+  setLoadingMessage: (loadingMessage: string) => void;
   classes: any;
 }
 
 const Camera: React.FunctionComponent<CameraProps> = ({
   navbarRef,
+  setLoadingMessage,
   classes,
 }) => {
   const [maxWidth, setMaxWidth] = React.useState<number>(0);
@@ -25,13 +27,15 @@ const Camera: React.FunctionComponent<CameraProps> = ({
   const [webcamEnabled, setWebcamEnabled] = React.useState<boolean>(true);
 
   const capture = () => {
+    setLoadingMessage("Analyzing Image...");
     const imageSrc = webcamRef.current?.getScreenshot();
     (document.getElementById("automlImage") as HTMLImageElement).src = imageSrc;
     setTimeout(
       () =>
         predictPlant()
           .then((prediction) => console.log(prediction))
-          .catch((err) => console.log(err)),
+          .catch((err) => console.log(err))
+          .finally(() => setLoadingMessage("")),
       10
     );
   };

@@ -4,10 +4,14 @@ import React, { Fragment } from "react";
 import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface UploadProps {
+  setLoadingMessage: (loadingMessage: string) => void;
   classes: any;
 }
 
-const Upload: React.FunctionComponent<UploadProps> = ({ classes }) => {
+const Upload: React.FunctionComponent<UploadProps> = ({
+  setLoadingMessage,
+  classes,
+}) => {
   const getBase64 = (file: File) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -32,6 +36,7 @@ const Upload: React.FunctionComponent<UploadProps> = ({ classes }) => {
           maxFileSize={5000000}
           showPreviewsInDropzone={false}
           onDrop={async (files: any) => {
+            setLoadingMessage("Analyzing Image...");
             const imageSrc = await getBase64(files[0]);
             (document.getElementById(
               "automlImage"
@@ -40,7 +45,8 @@ const Upload: React.FunctionComponent<UploadProps> = ({ classes }) => {
               () =>
                 predictPlant()
                   .then((prediction) => console.log(prediction))
-                  .catch((err) => console.log(err)),
+                  .catch((err) => console.log(err))
+                  .finally(() => setLoadingMessage("")),
               10
             );
           }}

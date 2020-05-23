@@ -5,10 +5,12 @@ import Camera from "./Camera";
 import Info from "./Info";
 import NavBar from "./NavBar";
 import Upload from "./Upload";
+import LoadingScreen from "./LoadingScreen";
 
 const App: React.FunctionComponent = () => {
   const [plant, setPlant] = React.useState<string>("");
   const [mode, setMode] = React.useState<PictureMode>("camera");
+  const [loadingMessage, setLoadingMessage] = React.useState<string>("");
   const navbarRef = React.useRef<HTMLDivElement>(null);
 
   const back = () => {
@@ -33,10 +35,15 @@ const App: React.FunctionComponent = () => {
       {plant ? (
         <Info />
       ) : mode === "camera" ? (
-        <Camera navbarRef={navbarRef} classes={classes} />
+        <Camera
+          navbarRef={navbarRef}
+          setLoadingMessage={setLoadingMessage}
+          classes={classes}
+        />
       ) : (
-        <Upload classes={classes} />
+        <Upload setLoadingMessage={setLoadingMessage} classes={classes} />
       )}
+      <LoadingScreen loadingMessage={loadingMessage} />
     </Fragment>
   );
 };
