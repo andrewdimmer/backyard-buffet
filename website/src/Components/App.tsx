@@ -8,13 +8,13 @@ import Upload from "./Upload";
 import LoadingScreen from "./LoadingScreen";
 
 const App: React.FunctionComponent = () => {
-  const [plantKey, setPlantKeys] = React.useState<PlantKeys>(undefined);
+  const [plantKey, setPlantKey] = React.useState<PlantKeys>(undefined);
   const [mode, setMode] = React.useState<PictureMode>("camera");
   const [loadingMessage, setLoadingMessage] = React.useState<string>("");
   const navbarRef = React.useRef<HTMLDivElement>(null);
 
   const back = () => {
-    setPlantKeys(undefined);
+    setPlantKey(undefined);
   };
 
   const toggleMode = () => {
@@ -37,11 +37,16 @@ const App: React.FunctionComponent = () => {
       ) : mode === "camera" ? (
         <Camera
           navbarRef={navbarRef}
+          setPlantKey={setPlantKey}
           setLoadingMessage={setLoadingMessage}
           classes={classes}
         />
       ) : (
-        <Upload setLoadingMessage={setLoadingMessage} classes={classes} />
+        <Upload
+          setPlantKey={setPlantKey}
+          setLoadingMessage={setLoadingMessage}
+          classes={classes}
+        />
       )}
       <LoadingScreen loadingMessage={loadingMessage} />
     </Fragment>

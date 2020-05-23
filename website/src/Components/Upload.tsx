@@ -1,14 +1,17 @@
 import { Container, Typography } from "@material-ui/core";
 import { DropzoneArea } from "material-ui-dropzone";
 import React, { Fragment } from "react";
+import { PlantKeys } from "../@Types/types";
 import { predictPlant } from "../Scripts/tensorflow";
 
 declare interface UploadProps {
+  setPlantKey: (plantKey: PlantKeys) => void;
   setLoadingMessage: (loadingMessage: string) => void;
   classes: any;
 }
 
 const Upload: React.FunctionComponent<UploadProps> = ({
+  setPlantKey,
   setLoadingMessage,
   classes,
 }) => {
@@ -44,7 +47,7 @@ const Upload: React.FunctionComponent<UploadProps> = ({
             setTimeout(
               () =>
                 predictPlant()
-                  .then((prediction) => console.log(prediction))
+                  .then((prediction) => setPlantKey(prediction))
                   .catch((err) => console.log(err))
                   .finally(() => setLoadingMessage("")),
               10
