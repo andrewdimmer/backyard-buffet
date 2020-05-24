@@ -116,7 +116,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ plantKey, classes }) => {
         )}
         {plantInfo.howToEat && (
           <Fragment>
-            <Typography variant="h5">Used as Food:</Typography>
+            <Typography variant="h5">How to Eat:</Typography>
             <List>
               {plantInfo.howToEat.map((value, index) => (
                 <ListItem key={"howToEat_" + index}>
